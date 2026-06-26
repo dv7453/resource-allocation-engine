@@ -2,7 +2,7 @@ import { useState } from 'react'
 import MapView from './components/MapView'
 import MetricsPanel from './components/MetricsPanel'
 
-const API = 'http://localhost:8000'
+const API = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 const VIEWS = [
   { id: 'greedy',    label: 'Greedy' },
