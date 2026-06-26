@@ -102,12 +102,12 @@ export default function App() {
         )}
       </div>
 
-      {error && <div className="error-bar">{error}</div>}
+      {error && <div className="error-bar" role="alert">{error}</div>}
 
-      <div className="main">
+      <main className="main">
         <MapView data={data} results={results} activeView={activeView} />
         {results && <MetricsPanel results={results} />}
-      </div>
+      </main>
     </div>
   )
 }
