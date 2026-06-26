@@ -1,0 +1,284 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+/* ---- Layout ---- */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+header {
+  background: #1e40af;
+  color: #fff;
+  padding: 10px 20px;
+  flex-shrink: 0;
+}
+
+header h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+header p {
+  font-size: 0.8rem;
+  opacity: 0.75;
+  margin-top: 2px;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 20px;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.controls label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.controls input[type="range"] {
+  width: 90px;
+  accent-color: #2563eb;
+}
+
+.btn-primary {
+  padding: 6px 14px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---- View toggle ---- */
+
+.view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.toggle-label {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-right: 4px;
+}
+
+.view-toggle button {
+  padding: 4px 10px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #475569;
+}
+
+.view-toggle button.active {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+/* ---- Error ---- */
+
+.error-bar {
+  background: #fef2f2;
+  color: #b91c1c;
+  padding: 6px 20px;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #fecaca;
+  flex-shrink: 0;
+}
+
+/* ---- Main layout ---- */
+
+.main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ---- Map ---- */
+
+.map-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e2e8f0;
+  color: #64748b;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.map-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---- Metrics Panel ---- */
+
+.metrics-panel {
+  width: 260px;
+  flex-shrink: 0;
+  background: #fff;
+  border-left: 1px solid #e2e8f0;
+  padding: 14px 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.metrics-panel h2 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.metrics-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.metrics-header {
+  display: grid;
+  grid-template-columns: 1fr 72px 72px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.col-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.greedy-color    { color: #2563eb; }
+.hungarian-color { color: #d97706; }
+
+.metric-row {
+  display: grid;
+  grid-template-columns: 1fr 72px 72px;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.metric-label {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.metric-val {
+  font-size: 0.82rem;
+  font-weight: 500;
+  text-align: center;
+  color: #334155;
+}
+
+.metric-val.winner {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+/* ---- Legend ---- */
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.legend-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.line-sample {
+  width: 22px;
+  height: 3px;
+  flex-shrink: 0;
+}
+
+.line-sample.dashed.blue {
+  background: repeating-linear-gradient(
+    to right,
+    #2563eb 0 5px,
+    transparent 5px 9px
+  );
+}
+
+.line-sample.solid.amber {
+  background: #d97706;
+}
+
+.winner-note {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* ---- Unassigned ---- */
+
+.unassigned-section {
+  font-size: 0.78rem;
+  color: #475569;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
