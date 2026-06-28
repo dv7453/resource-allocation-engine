@@ -5,9 +5,10 @@ import MetricsPanel from './components/MetricsPanel'
 const API = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
 const VIEWS = [
-  { id: 'greedy',    label: 'Greedy' },
-  { id: 'hungarian', label: 'Hungarian' },
-  { id: 'all',       label: 'All' },
+  { id: 'greedy',             label: 'Greedy' },
+  { id: 'hungarian',          label: 'Hungarian' },
+  { id: 'weighted_hungarian', label: 'Wt. Hungarian' },
+  { id: 'all',                label: 'All' },
 ]
 
 export default function App() {
@@ -53,7 +54,7 @@ export default function App() {
       <header>
         <div>
           <h1>Resource Allocation Engine</h1>
-          <p>Delivery Fleet Optimisation — Greedy (priority-first) · Hungarian (globally optimal)</p>
+          <p>Delivery Fleet Optimisation — Greedy · Hungarian · Weighted Hungarian</p>
         </div>
       </header>
 

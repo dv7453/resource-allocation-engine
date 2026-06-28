@@ -13,6 +13,7 @@ export default function MapView({ data, results, activeView }) {
 
   const greedyAssignments    = results?.greedy?.assignments ?? []
   const hungarianAssignments = results?.hungarian?.assignments ?? []
+  const whAssignments        = results?.weighted_hungarian?.assignments ?? []
 
   function truckPos(id) {
     const t = data.trucks.find(t => t.id === id)
@@ -24,8 +25,9 @@ export default function MapView({ data, results, activeView }) {
     return o ? [o.lat, o.lon] : null
   }
 
-  const showGreedy    = activeView === 'greedy'    || activeView === 'all'
-  const showHungarian = activeView === 'hungarian' || activeView === 'all'
+  const showGreedy    = activeView === 'greedy'             || activeView === 'all'
+  const showHungarian = activeView === 'hungarian'          || activeView === 'all'
+  const showWH        = activeView === 'weighted_hungarian' || activeView === 'all'
   const multiAlgo     = activeView === 'all'
 
   return (
@@ -104,6 +106,31 @@ export default function MapView({ data, results, activeView }) {
             >
               <Tooltip sticky>
                 <strong>Hungarian: {a.truck_id} → {a.order_id}</strong><br />
+                {a.distance_km} km<br />
+                <em style={{ fontSize: '0.8em', color: '#475569' }}>{a.reason}</em>
+              </Tooltip>
+            </Polyline>
+          )
+        })}
+
+        {/* Weighted Hungarian — purple dotted lines */}
+        {showWH && whAssignments.map(a => {
+          const tp = truckPos(a.truck_id)
+          const op = orderPos(a.order_id)
+          if (!tp || !op) return null
+          return (
+            <Polyline
+              key={`wh-${a.truck_id}-${a.order_id}`}
+              positions={[tp, op]}
+              pathOptions={{
+                color: '#7c3aed',
+                weight: multiAlgo ? 2 : 3,
+                dashArray: multiAlgo ? '2 5' : '4 4',
+                opacity: 0.85,
+              }}
+            >
+              <Tooltip sticky>
+                <strong>Weighted Hungarian: {a.truck_id} → {a.order_id}</strong><br />
                 {a.distance_km} km<br />
                 <em style={{ fontSize: '0.8em', color: '#475569' }}>{a.reason}</em>
               </Tooltip>

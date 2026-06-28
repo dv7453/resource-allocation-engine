@@ -6,6 +6,7 @@ from models import Truck, Order
 from data_generator import generate_data
 from algorithms.greedy import greedy_allocate
 from algorithms.hungarian import hungarian_allocate
+from algorithms.weighted_hungarian import weighted_hungarian_allocate
 from metrics import compute_metrics
 
 app = FastAPI(title="Resource Allocation Engine")
@@ -60,17 +61,20 @@ def generate(
 @app.post("/allocate")
 def allocate(req: AllocateRequest):
     """
-    Run Greedy and Hungarian on the same dataset and return a side-by-side comparison.
+    Run all three algorithms on the same dataset and return a side-by-side comparison.
 
-    - Greedy    : priority-first, nearest available truck (fast, locally optimal)
-    - Hungarian : globally optimal total distance via the Hungarian algorithm
+    - Greedy            : priority-first, nearest available truck (fast, locally optimal)
+    - Hungarian         : globally optimal total distance, ignores priority
+    - Weighted Hungarian: Hungarian with priority discounts in the cost matrix,
+                          balances distance optimality with order urgency
     """
     trucks = [Truck(**t.model_dump()) for t in req.trucks]
     orders = [Order(**o.model_dump()) for o in req.orders]
     n = len(orders)
 
-    g_assign, g_unassigned, g_ms = greedy_allocate(trucks, orders)
-    h_assign, h_unassigned, h_ms = hungarian_allocate(trucks, orders)
+    g_assign,  g_unassigned,  g_ms  = greedy_allocate(trucks, orders)
+    h_assign,  h_unassigned,  h_ms  = hungarian_allocate(trucks, orders)
+    wh_assign, wh_unassigned, wh_ms = weighted_hungarian_allocate(trucks, orders)
 
     return {
         "greedy": {
@@ -82,5 +86,10 @@ def allocate(req: AllocateRequest):
             "assignments": [a.__dict__ for a in h_assign],
             "unassigned": h_unassigned,
             "metrics": compute_metrics(h_assign, h_unassigned, h_ms, n),
+        },
+        "weighted_hungarian": {
+            "assignments": [a.__dict__ for a in wh_assign],
+            "unassigned": wh_unassigned,
+            "metrics": compute_metrics(wh_assign, wh_unassigned, wh_ms, n),
         },
     }

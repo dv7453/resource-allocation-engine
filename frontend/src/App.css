@@ -154,7 +154,7 @@ header p {
 /* ---- Metrics Panel ---- */
 
 .metrics-panel {
-  width: 260px;
+  width: 310px;
   flex-shrink: 0;
   background: #fff;
   border-left: 1px solid #e2e8f0;
@@ -179,7 +179,7 @@ header p {
 
 .metrics-header {
   display: grid;
-  grid-template-columns: 1fr 72px 72px;
+  grid-template-columns: 1fr 56px 56px 72px;
   padding-bottom: 6px;
   border-bottom: 2px solid #f1f5f9;
 }
@@ -192,10 +192,11 @@ header p {
 
 .greedy-color    { color: #2563eb; }
 .hungarian-color { color: #d97706; }
+.wh-color        { color: #7c3aed; }
 
 .metric-row {
   display: grid;
-  grid-template-columns: 1fr 72px 72px;
+  grid-template-columns: 1fr 56px 56px 72px;
   align-items: center;
   padding: 5px 0;
   border-bottom: 1px solid #f8fafc;
@@ -265,6 +266,14 @@ header p {
 
 .line-sample.solid.amber {
   background: #d97706;
+}
+
+.line-sample.dotted.purple {
+  background: repeating-linear-gradient(
+    to right,
+    #7c3aed 0 2px,
+    transparent 2px 7px
+  );
 }
 
 .winner-note {

@@ -2,7 +2,7 @@
 
 ## Problem Recap
 
-We have a set of trucks (each with a location and a weight capacity) and a set of delivery orders (each with a location, weight, and priority). The goal is to assign trucks to orders in a way that is both feasible (capacity respected) and efficient (minimises travel distance).
+We have a set of trucks (each with a location and a weight capacity) and a set of delivery orders (each with a location, weight, and priority). The goal is to assign trucks to orders in a way that is both feasible (capacity respected) and efficient (minimises travel distance while honouring order urgency).
 
 ---
 
@@ -32,34 +32,57 @@ Build a cost matrix of size (trucks × orders), where each cell holds the distan
 - Considers all trucks and orders at the same time, so it avoids the "greedy trap" of committing too early.
 
 **Where it falls short:**  
-- Treats all orders as equally important — priority is not factored in.
+- Treats all orders as equally important — priority is not factored into the cost.
+- A nearby low-priority order will always beat a far high-priority one in a pure distance optimisation.
 - Batch-only: all orders must be known upfront. Not suitable for real-time/streaming dispatch.
-- Slightly slower for large inputs, though in practice the difference is negligible for fleet sizes relevant to this problem.
 
 ---
 
-## What I Observed
+## Algorithm 3: Weighted Hungarian
 
-Running both algorithms on the same synthetic dataset consistently showed:
+**How it works:**  
+Identical to the Hungarian algorithm except the cost matrix entries are modified before being passed to the solver:
 
-- **Hungarian almost always achieves a lower or equal total distance** compared to Greedy. The saving is most visible when trucks are clustered together and orders are spread out — Greedy may assign a close truck to a low-priority order, leaving a far truck for a high-priority one, whereas Hungarian would swap those assignments to reduce total distance.
+```
+cost[i][j] = distance(truck_i, order_j) − (priority_weight × priority_score(order_j))
+```
 
-- **Greedy wins on priority-sensitive scenarios.** When one high-priority order is far from all trucks, Greedy guarantees it gets the best available truck first. Hungarian might assign that truck to a nearby low-priority order because it produces a lower total cost.
+Where `priority_score` maps high → 3, medium → 2, low → 1, and `priority_weight` is a tunable multiplier (default 5 km per score point). The discount makes high-priority cells look cheaper to the optimiser, so it prefers assigning those pairings. The actual distance recorded in each assignment is always the real haversine distance — the weight only influences which pairings get chosen.
 
-- **The difference narrows with more trucks than orders.** When trucks are abundant, both algorithms have good options for every order and converge on similar solutions.
+**What it does well:**  
+- Inherits Hungarian's global optimality guarantee while also encoding business priority.
+- One knob to tune: increasing `priority_weight` makes priority more aggressive; setting it to 0 reduces to vanilla Hungarian.
+- Guaranteed to outperform vanilla Hungarian at assigning high-priority orders when trucks are constrained.
 
-- **Runtime:** Both algorithms run in milliseconds for the dataset sizes used here. For very large fleets (hundreds of trucks and orders), the O(n³) complexity of Hungarian would eventually become a bottleneck where Greedy remains practical.
+**Where it falls short:**  
+- Can produce a higher total distance than vanilla Hungarian — it deliberately accepts a longer route to serve a high-priority order.
+- The right value of `priority_weight` depends on business judgement: how many extra kilometres is it worth spending to guarantee a high-priority order gets the best truck?
 
 ---
 
-## Takeaway
+## What We Observed
 
-Neither algorithm is universally better. The right choice depends on the operational context:
+Running all three algorithms on the same synthetic Bangalore dataset consistently showed:
+
+- **Hungarian achieves the lowest total distance.** It sees every possible pairing at once and picks the globally cheapest combination. Greedy and Weighted Hungarian both produce longer totals.
+
+- **Greedy wins on priority fulfilment in real-time scenarios.** Because it processes high-priority orders first and grabs the nearest available truck, it naturally protects urgent orders. It is also by far the fastest.
+
+- **Weighted Hungarian sits between the two.** It produces a slightly higher total distance than vanilla Hungarian (it pays a distance penalty to serve high-priority orders better) but a lower total distance than Greedy. It is the only algorithm that simultaneously optimises both concerns: global distance efficiency *and* order urgency.
+
+- **The difference between Hungarian and Weighted Hungarian is most visible when trucks are scarce.** When every truck matters, vanilla Hungarian will sacrifice a high-priority order to a farther truck if that reduces total distance. Weighted Hungarian will reassign the nearest truck to the high-priority order even at a cost.
+
+- **All three produce identical results when all orders have the same priority** — with uniform priority scores the weighted cost matrix is just a uniform shift of the distance matrix, which doesn't change which pairing minimises the sum.
+
+---
+
+## When Each Algorithm Wins
 
 | Context | Recommended Algorithm |
 |---|---|
 | Real-time dispatch, orders arrive live | Greedy |
-| Priority is the primary concern | Greedy |
-| Batch planning, all orders known upfront | Hungarian |
-| Minimising total fleet mileage / fuel cost | Hungarian |
-| Mixed priority + cost optimisation | Custom heuristic combining both |
+| Priority is the primary concern | Greedy or Weighted Hungarian |
+| Batch planning, minimise total fleet mileage | Hungarian |
+| Batch planning, balance distance + priority | Weighted Hungarian |
+| Large fleets (100+ trucks), speed matters | Greedy |
+| Need a provably optimal baseline | Hungarian |
